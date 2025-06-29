@@ -4,12 +4,12 @@ import { Link, NavLink } from 'react-router-dom'
 
 const NavBar = () => {
   return (
-    <div className='flex justify-between items-center lg:mx-40 md:mx-20 sm:mx-10 mx-5 my-5'>
+    <div className='flex justify-between items-center lg:mx-40 md:mx-16 sm:mx-10 mx-5 my-5'>
       <div>
         <img src={assets.logo} alt="" className='h-12'/>
       </div>
 
-      <div className='flex justify-between items-center gap-4'>
+      <div className='md:flex justify-between items-center gap-4 hidden'>
         <NavLink to='/' >
           <p>HOME</p>
           <hr className='w-3/4 mx-auto hidden'/>
