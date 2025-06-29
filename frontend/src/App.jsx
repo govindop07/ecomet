@@ -5,12 +5,12 @@ import NavBar from './components/NavBar'
 
 const App = () => {
   return (
-    <div className='bg-black'>
+    <div className=''>
 
       <NavBar />
       
       <Routes>
-        <Route path='/' element={<HomePage} />
+        <Route path='/' element={<HomePage />} />
         {/* <Route path='/collection' element */}
       </Routes>
     </div>
