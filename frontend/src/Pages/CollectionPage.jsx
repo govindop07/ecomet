@@ -124,4 +124,4 @@ useEffect(() => {
   )
 }
 
-export default CollectionPage
+export default CollectionPage;
