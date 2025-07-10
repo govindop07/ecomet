@@ -5,7 +5,7 @@ import ProductItem from '../components/ProductItem';
 
 const CollectionPage = () => {
 
-  const { products } = useContext(ShopContext);
+  const { products, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(true);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
@@ -34,6 +34,10 @@ const CollectionPage = () => {
 useEffect(() => {
   let filtered = products;
 
+  if(search && showSearch) {
+    filtered = filtered.filter((product) => product.name.toLowerCase().includes(search.toLowerCase()));
+  }
+
   if (category.length > 0) {
     filtered = filtered.filter((p) => category.includes(p.category));
   }
@@ -49,7 +53,7 @@ useEffect(() => {
   }
 
   setFilterProducts(filtered);
-}, [products, category, subCategory, sortBy]);
+}, [products, category, subCategory, sortBy, search, showSearch]);
 
 
   return (
@@ -65,13 +69,13 @@ useEffect(() => {
           <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>Men
-              <input type="checkbox" className='w-3' value={'Men'} onClick={toggleCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Men'} onClick={toggleCategory}/>
             </p>
             <p className='flex gap-2'>Women
-              <input type="checkbox" className='w-3' value={'Women'} onClick={toggleCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Women'} onClick={toggleCategory}/>
             </p>
             <p className='flex gap-2'>Kids
-              <input type="checkbox" className='w-3' value={'Kids'} onClick={toggleCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Kids'} onClick={toggleCategory}/>
             </p>
           </div>
         </div>
@@ -80,13 +84,13 @@ useEffect(() => {
           <p className='mb-3 text-sm font-medium'>TYPE</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>Topwear
-              <input type="checkbox" className='w-3' value={'Topwear'} onClick={toggleSubCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Topwear'} onClick={toggleSubCategory}/>
             </p>
             <p className='flex gap-2'>Bottomwear
-              <input type="checkbox" className='w-3' value={'Bottomwear'} onClick={toggleSubCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Bottomwear'} onClick={toggleSubCategory}/>
             </p>
             <p className='flex gap-2'>Winterwear
-              <input type="checkbox" className='w-3' value={'Winterwear'} onClick={toggleSubCategory}/>
+              <input type="checkbox" className='w-3 cursor-pointer' value={'Winterwear'} onClick={toggleSubCategory}/>
             </p>
           </div>
         </div>
