@@ -4,7 +4,7 @@ import { adminLogin, loginUser, RegisterUser } from '../controllers/user.control
 const router = express.Router();
 
 router.post('/register', RegisterUser);
-router.get('/login', loginUser);
+router.post('/login', loginUser);
 router.post('/admin', adminLogin);
 
 export default router;
