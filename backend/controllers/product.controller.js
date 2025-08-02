@@ -33,12 +33,43 @@ export const addProduct = async (req, res) => {
     const product = new productModel(productData);
     await product.save();
 
-    return res.status(200).json({message: "Product added succesfully"});
-    return res.status(200).json({});
+    return res.status(200).json({success: true, message: "Product added succesfully"});
   } catch (error) {
     console.log(error.message)
-    return res.status(500).json({message: "Something went wrong in add product controller"});
+    return res.status(500).json({success: false, message: "Something went wrong in add product controller"});
   }
 }
 
+export const listProducts = async (req, res) => {
+  try {
+    const products = await productModel.find();
+    res.status(200).json({success: true, products});
 
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({success: false, message: "Something went wrong in listProducts controller"});
+  }
+}
+
+export const removeProduct = async (req, res) => {
+  try {
+    const id = req.body.id;
+    await productModel.findByIdAndDelete(id);
+    res.status(200).json({success: true, message:"Product removed successful"})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({success: false, message: "Something went wrong in removeProduct controller"});
+  }
+}
+
+export const singleProduct = async (req, res) => {
+  try {
+    const {productId} = req.body;
+    const product = await productModel.findById(productId);
+    return res.status(200).json({success: true, product});
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({success: false, message: "Something went wrong in singleProduct controller"});
+  }
+}

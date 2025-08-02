@@ -11,9 +11,13 @@ export const RegisterUser = async (req, res) => {
       return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
-    const existingUser = await userModel.findOne({ username });
-    if (existingUser) {
+    const usernameExists = await userModel.findOne({ username });
+    if (usernameExists) {
       return res.status(400).json({ success: false, message: "Username already exists." });
+    }
+    const emailExists = await userModel.findOne({ email });
+    if (emailExists) {
+      return res.status(400).json({ success: false, message: "Email already exists." });
     }
 
     if (!validator.isEmail(email)) {
@@ -52,14 +56,14 @@ export const RegisterUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    if (!username || !password) {
-        return res.status(400).json({ success: false, message: "Username and password are required." });
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: "email and password are required." });
     }
 
-    const user = await userModel.findOne({ username });
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid credentials." });
     }
@@ -71,7 +75,7 @@ export const loginUser = async (req, res) => {
 
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
     const token = jwt.sign(
-      { id: user._id, username: user.username },
+      { id: user._id, email: user.email },
       process.env.JWT_SECRET_KEY,
       { expiresIn: '7d' } 
     );
@@ -86,6 +90,7 @@ export const loginUser = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Login successful!",
+      token,
       user: {
         _id: user._id,
         username: user.username,
@@ -100,46 +105,16 @@ export const loginUser = async (req, res) => {
 };
 
 export const adminLogin = async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        const user = await userModel.findOne({ username });
-
-        if (!user || user.role !== 'admin') {
-            return res.status(403).json({ success: false, message: "Access denied. Not an admin." });
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        if (!isPasswordCorrect) {
-            return res.status(400).json({ success: false, message: "Invalid credentials." });
-        }
-
-        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-        const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
-            process.env.JWT_SECRET_KEY,
-            { expiresIn: '7d' }
-        );
-
-        res.cookie("admin_jwt", token, {
-            maxAge: sevenDaysInMs,
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: process.env.NODE_ENV !== "development"
-        });
-
-        res.status(200).json({
-            success: true,
-            message: "Admin login successful!",
-            user: {
-                _id: user._id,
-                username: user.username,
-                role: user.role
-            }
-        });
-
-    } catch (error) {
-        console.error("Error in adminLogin:", error.message);
-        return res.status(500).json({ success: false, message: "Internal server error during admin login." });
+  try {
+    const {email, password} = req.body;
+    if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign(email+password, process.env.JWT_SECRET_KEY);
+      res.json({success: true, token})
+    } else {
+      res.json({success: false, message: "Invalid credentials"})
     }
+  } catch  (error) {
+    console.log(error);
+    res.json({success: false, message: error.message});
+  }
 };
