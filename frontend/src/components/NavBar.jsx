@@ -1,18 +1,30 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import {assets} from '../assets/frontend_assets/assets'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, Navigate, NavLink, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { ShopContext } from '../context/ShopContext';
+import { toast } from 'react-toastify';
 
 const NavBar = () => {
-
   const [visible, setVisible] = useState(false);
+  const {setShowSearch, cartCount, cartItems, token, setToken, setCartItems } = useContext(ShopContext);
+  const navigate = useNavigate();
+  const path = useLocation();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken('');
+    setCartItems({});
+    toast.success('Logout successful');
+    navigate("/login");
+  }
 
   return (
     <div className='flex justify-between items-center lg:mx-40 md:mx-16 sm:mx-10 mx-5 my-5'>
-      <div>
-        <img src={assets.logo} alt="" className='h-8 md:h-12'/>
-      </div>
+      <Link to='/'>
+        <img src={assets.logo} alt="" className='h-8 md:h-12 bg-blend-multiplyedge'/>
+      </Link>
 
-      <div className='md:flex justify-between items-center gap-4 hidden'>
+      <div className='md:flex justify-between items-center gap-4 text-sm hidden'>
         <NavLink to='/' >
           <p>HOME</p>
           <hr className='w-3/4 mx-auto hidden'/>
@@ -33,24 +45,28 @@ const NavBar = () => {
 
       <div className='flex justify-center items-center gap-4 relative'>
           <div>
-            <img src={assets.search_icon} alt="" className='h-6 cursor-pointer'/>
+            {path.pathname === '/collection' && <img src={assets.search_icon} onClick={()=> setShowSearch(true)} alt="" className='h-6 cursor-pointer'/>}
           </div>
           <div className='group relative'>
-            <img src={assets.profile_icon} alt="" className='w-5 md:h-6 cursor-pointer'/>
-            <div className='group-hover:block hidden absolute droupdown-menu right-0 pt-4'>
-              <ul>
-                <li className='px-4 py-2 hover:bg-gray-200 cursor-pointer'>Profile</li>
-                <li className='px-4 py-2 hover:bg-gray-200 cursor-pointer'>Orders</li>
-                <li className='px-4 py-2 hover:bg-gray-200 cursor-pointer'>Logout</li>
-              </ul>
-            </div>
+            <img onClick={() => token ? null : navigate("/login")} src={assets.profile_icon} alt="" className='w-5 md:h-6 cursor-pointer'/>
+            {/* Dropdown menu */}
+            {
+              token && (
+                <div className='group-hover:block hidden absolute droupdown-menu right-0 pt-4'>
+                  <ul className='bg-gray-100'>
+                    <li onClick={() => navigate("/orders")} className='px-4 py-2 hover:bg-gray-200 cursor-pointer'>Orders</li>
+                    <li onClick={handleLogout} className='px-4 py-2 hover:bg-gray-200 cursor-pointer'>Logout</li>
+                  </ul>
+                </div>
+              )
+            }
           </div>
 
           <Link to='/cart' className='relative'>
             <img src={assets.cart_icon} alt="" className='w-5 min-w-5'/>
-            <p className='absolute right-[-5px] bottom-[-5px] w-4 rounded-full text-white text-center leading-4 bg-black aspect-square text-[8px]'>10</p>
+            <p className='absolute right-[-5px] bottom-[-5px] px-[1px] pt-[0.5px] w-4 rounded-full font-normal text-[1.2vh] text-white text-center leading-4 bg-black aspect-square'>{cartCount}</p>
           </Link>
-          <img onClick={() => setVisible(true)} src={assets.menu_icon} className='w-6 pt-1 cursor-pointer' />
+          <img onClick={() => setVisible(true)} src={assets.menu_icon} className='w-6 pt-1 cursor-pointer sm:hidden' />
 
       </div>
 
