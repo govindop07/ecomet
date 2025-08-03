@@ -3,11 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import {toast } from 'react-toastify'
-import { backendUrl } from '../../../admin/src/App';
 
 const VerifyPage = () => {
 
-  const {token, setCartItems} = useContext(ShopContext);
+  const {token, setCartItems, backend_url} = useContext(ShopContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const success = searchParams.get('success');
   const orderId = searchParams.get('orderId');
@@ -16,7 +15,7 @@ const VerifyPage = () => {
   const verifyPayment = async() => {
     try {
       if(!token) return null;
-      const response = await axios.post(backendUrl+'/api/order/verifyStripe', {success, orderId}, {headers: {token}});
+      const response = await axios.post(backend_url+'/api/order/verifyStripe', {success, orderId}, {headers: {token}});
       if(response.data.success) {
         setCartItems({});
         navigate('/orders');
