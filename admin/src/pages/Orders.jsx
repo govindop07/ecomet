@@ -4,10 +4,12 @@ import axios from 'axios';
 import { backendUrl } from "../App";
 import {toast} from 'react-toastify';
 import { assets } from "../assets/assets";
+import Loading from "../components/Loading";
 
 const Orders = ({token}) => {
 
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchAllOrders = async () => {
     if (!token) {
@@ -15,6 +17,7 @@ const Orders = ({token}) => {
     }
 
     try {
+      setLoading(true);
       const response = await axios.post(backendUrl+'/api/order/list', {}, {headers: {token}});
       if(response.data.success) {
         setOrders(response.data.orders.reverse());
@@ -25,6 +28,8 @@ const Orders = ({token}) => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -48,7 +53,9 @@ const Orders = ({token}) => {
     <div>
       <h3>Order Page</h3>
       <div>
-        {
+        { loading ? (
+          <Loading />
+        ) : 
           orders.map((order, index) => (
             <div className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-sm text-gray-700" key={index}>
               <img className="w-12" src={assets.parcel_icon} alt="" />
@@ -70,22 +77,22 @@ const Orders = ({token}) => {
                   <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
                 </div>
                 <p>{order.address.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm sm:text-[15px]">Items: {order.items.length}</p>
+                <p className="mt-3">Method: {order.paymentMethod}</p>
+                <p>Payment: {order.payment ? "Done" : "Pending"}</p>
+                <p>Date: {new Date(order.date).toDateString()}</p>
+              </div>
+              <p className="text-sm sm:text-[15px]">₹ {order.amount}</p>
+              <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className="p-2 font-semibold border-2 border-gray-200">
+                <option value="Order Placed">Order Placed</option>
+                <option value="Packing">Packing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Out for delivery">Out for delivery</option>
+                <option value="Delivered">Delivered</option>
+              </select>
             </div>
-            <div>
-              <p className="text-sm sm:text-[15px]">Items: {order.items.length}</p>
-              <p className="mt-3">Method: {order.paymentMethod}</p>
-              <p>Payment: {order.payment ? "Done" : "Pending"}</p>
-              <p>Date: {new Date(order.date).toDateString()}</p>
-            </div>
-            <p className="text-sm sm:text-[15px]">₹ {order.amount}</p>
-            <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className="p-2 font-semibold border-2 border-gray-200">
-              <option value="Order Placed">Order Placed</option>
-              <option value="Packing">Packing</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Out for delivery">Out for delivery</option>
-              <option value="Delivered">Delivered</option>
-            </select>
-          </div>
           ))
         }
       </div>
