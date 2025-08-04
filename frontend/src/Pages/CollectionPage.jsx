@@ -139,7 +139,7 @@ const CollectionPage = () => {
               <input
                 type="checkbox"
                 className="w-3 cursor-pointer"
-                value={"Winterwear"}
+                value={"winterwear"}
                 onClick={toggleSubCategory}
               />
             </p>
