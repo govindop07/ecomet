@@ -1,20 +1,23 @@
 import { useContext } from "react"
 import { ShopContext } from "../context/ShopContext"
+import OrdersLoader from '../components/loading/OrdersLoader'
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const OrdersPage = () => {
 
   const {backend_url, token, currency} = useContext(ShopContext);
 
   const [orderData, setOrderData] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const loadOrderData = async() => {
     try {
       if(!token) return null;
-
+      setLoadingOrders(true);
       const response = await axios.post(backend_url+'/api/order/userorders', {}, {headers: {token}})
       if(response.data.success) {
         let allOrdersItem = [];
@@ -36,6 +39,8 @@ const OrdersPage = () => {
     } catch (error) {
       console.log(error);
       console.log(error.message);
+    } finally {
+      setLoadingOrders(false);
     }
   }
 
@@ -51,7 +56,10 @@ const OrdersPage = () => {
             <span className='text-blue-950'> CART</span>
           </h1>
         </div>
-        
+
+        { loadingOrders ? (
+          <OrdersLoader />
+        ) : (
         <div>
           {
             orderData.slice(1, 4).map((item, index) => (
@@ -80,6 +88,18 @@ const OrdersPage = () => {
             ))
           }
         </div>
+        )}
+
+      {orderData.length == 0 ? (
+        <div className="text-gray-500 text-start mt-20">
+          You have not placed any order yet!  
+          <Link className="text-blue-400 text-xl" to={'/'}> Click here to visit Home page</Link>
+        </div>
+      ) : (
+        ""
+      )}
+
+
       </div>
     </div>
   )

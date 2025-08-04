@@ -7,7 +7,7 @@ cartRouter.post('/add', authUser, addToCart);
 cartRouter.post('/get', authUser, getUserCart);
 cartRouter.post('/update', authUser, updateCart);
 cartRouter.get('/test', (req, res) => {
-  res.send("api working");
+  res.send("api working")
 });
 
 export default cartRouter;
